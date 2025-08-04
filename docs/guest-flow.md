@@ -9,7 +9,7 @@ graph TD
     G --> C;
     C -- Yes --> H[Displays simple list of **OPEN** issues];
     H --> I{Wants to add an issue?};
-    I -- Yes --> J[Clicks "Add New Issue"];
+    I -- Yes --> J[Clicks &quot;Add New Issue&quot;];
     J --> K[Fills out Title/Description Form];
     K --> L[Submits Form];
     L --> M[New issue appears in list];
