@@ -45,3 +45,18 @@ This document outlines the development tasks for the Know-Repo MVP. As tasks are
     - [ ] Create a simple marketing/landing page with a call-to-action to join a waitlist (can be a simple Tally or Mailchimp form).
     - [ ] Prepare the project for production and deploy to Vercel.
     - [ ] Set up all necessary production environment variables in Vercel.
+     
+
+## Phase 3: Post-MVP Enhancements (V1.1)
+
+- [ ] **Task 6: Enhance Guest Portal with README**
+    - [ ] Implement logic to fetch and render the content of the repository's `README.md` file at the top of the guest portal for context.
+    - [ ] Ensure the markdown is rendered cleanly and securely.
+
+- [ ] **Task 7: Advanced Issue Filtering**
+    - [ ] Add controls (e.g., tabs or a dropdown) to the guest portal to filter issues.
+    - [ ] Implement a "Closed" issues view.
+    - [ ] Implement an "In Progress" view (this may require the Admin to configure which GitHub label corresponds to "in-progress").
+    - [ ] Implement an "Assigned" view to see issues assigned to specific users.
+     
+---
