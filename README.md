@@ -53,9 +53,10 @@ graph TD
     I --> M[Clicks &quot;Share&quot; on a Repo Card];
     M --> N[Copies unique portal URL to clipboard];
     N --> O[End: Sends URL to Guest];
-Guest User Flow
-Code snippet
+```
 
+### Guest User Flow
+```mermaid
 graph TD
     A[Start: Guest receives Portal URL] --> B[Clicks Link];
     B --> C{Portal Page: Is Guest Authenticated?};
@@ -72,7 +73,9 @@ graph TD
     L --> M[New issue appears in list];
     M --> H;
     I -- No --> N[End: Finishes viewing];
-🛠️ Tech Stack
+```
+
+## 🛠️ Tech Stack
 Framework: Next.js 14 (App Router)
 
 Language: TypeScript
@@ -85,51 +88,48 @@ Deployment: Vercel
 
 GitHub Integration: Octokit.js
 
-🚀 Project Status
+## 🚀 Project Status
 This project is currently in the MVP development phase. The core features are being built as defined in the tasks.md document.
 
-🏁 Getting Started (Running Locally)
+## 🏁 Getting Started (Running Locally)
 To run this project locally, follow these steps:
-
 Clone the repository:
-
-Bash
-
+```
 git clone [https://github.com/](https://github.com/)[your-github-username]/know-repo.git
 cd know-repo
+```
 Install dependencies:
-
-Bash
-
+```
 npm install
+```
+
 Set up environment variables:
-
 Create a file named .env.local in the root of the project.
-
 Add your Supabase URL and Anon Key, as well as your GitHub OAuth Client ID and Secret.
-
-Code snippet
-
+```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 GITHUB_CLIENT_ID=your_github_oauth_client_id
 GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
-# You will also need a secret for encrypting the provider_token
+```
+
+You will also need a secret for encrypting the provider_token
+```
 ENCRYPTION_SECRET=a_very_strong_random_32_character_secret
+```
+
 Run the development server:
-
-Bash
-
+```
 npm run dev
+```
+
 Open http://localhost:3000 to view it in the browser.
 
-🗺️ Roadmap (Post-MVP)
+## 🗺️ Roadmap (Post-MVP)
 Our immediate focus after launching the MVP includes:
 
 [ ] Display Repository README.md: Show the README.md file in the guest portal for better context.
-
 [ ] Advanced Issue Filtering: Allow guests to view closed, in-progress, and assigned issues.
-
 [ ] Guest Commenting: Allow guests to add comments to existing issues.
 
 [ ] Admin Notifications: Notify admins via email when a guest creates a new issue.
