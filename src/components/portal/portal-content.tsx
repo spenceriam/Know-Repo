@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageSquare, Plus, GitBranch } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MessageSquare, Plus, GitBranch, Loader2, X, Calendar, User } from 'lucide-react'
+import CreateIssueModal from './create-issue-modal'
+import IssueCard from './issue-card'
 
 interface PortalContentProps {
   project: {
@@ -11,8 +13,83 @@ interface PortalContentProps {
   }
 }
 
+interface GitHubIssue {
+  id: number
+  number: number
+  title: string
+  body: string
+  state: string
+  created_at: string
+  updated_at: string
+  user: {
+    login: string
+    avatar_url: string
+  }
+  labels: Array<{
+    name: string
+    color?: string
+  }>
+}
+
 export default function PortalContent({ project }: PortalContentProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [issues, setIssues] = useState<GitHubIssue[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchIssues()
+  }, [project.id])
+
+  const fetchIssues = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/github/issues?projectId=${project.id}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch issues')
+      }
+
+      const data = await response.json()
+      setIssues(data.issues || [])
+    } catch (error) {
+      console.error('Error fetching issues:', error)
+      setError('Failed to load issues. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCreateIssue = async (title: string, description: string) => {
+    try {
+      const response = await fetch('/api/github/issues/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectId: project.id,
+          title,
+          description,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create issue')
+      }
+
+      const data = await response.json()
+      
+      // Add the new issue to the beginning of the list
+      setIssues(prevIssues => [data.issue, ...prevIssues])
+      setIsCreateModalOpen(false)
+    } catch (error) {
+      console.error('Error creating issue:', error)
+      setError('Failed to create issue. Please try again.')
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -28,11 +105,12 @@ export default function PortalContent({ project }: PortalContentProps) {
         </p>
       </div>
 
-      {/* Issues Section - Placeholder for Task 4 */}
+      {/* Issues Section */}
       <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-medium text-white">Issues</h3>
           <button
+            onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -40,13 +118,32 @@ export default function PortalContent({ project }: PortalContentProps) {
           </button>
         </div>
 
-        <div className="text-center py-12">
-          <MessageSquare className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-300 mb-2">No issues found</h4>
-          <p className="text-gray-500">
-            Issues will appear here once they are created or when the repository has existing issues.
-          </p>
-        </div>
+        {error && (
+          <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <span className="ml-2 text-gray-400">Loading issues...</span>
+          </div>
+        ) : issues.length === 0 ? (
+          <div className="text-center py-12">
+            <MessageSquare className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h4 className="text-lg font-medium text-gray-300 mb-2">No issues found</h4>
+            <p className="text-gray-500">
+              This repository doesn't have any open issues yet. Create the first one!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {issues.map((issue) => (
+              <IssueCard key={issue.id} issue={issue} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Info Section */}
@@ -64,6 +161,14 @@ export default function PortalContent({ project }: PortalContentProps) {
           </div>
         </div>
       </div>
+
+      {/* Create Issue Modal */}
+      <CreateIssueModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateIssue}
+        projectName={project.project_name}
+      />
     </div>
   )
 } 
