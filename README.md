@@ -1,65 +1,84 @@
-# Know-Repo MVP
+# Know-Repo
 
-A simple, secure web portal that allows non-technical stakeholders to view and create issues in GitHub repositories without requiring GitHub accounts.
+A secure guest portal system that allows repository owners to share their GitHub repositories with guests who can view and create issues without needing a GitHub account.
 
-## 🚀 Features
+## 🚀 **MVP Status: COMPLETE**
 
-- **Admin Dashboard**: GitHub OAuth authentication for repository owners
-- **Repository Management**: Add and manage which repositories are accessible to guests
-- **Guest Portal**: Magic link authentication for non-technical users
-- **Issue Management**: View and create issues through a simple interface
-- **Secure**: Row Level Security (RLS) policies protect data access
+The Know-Repo MVP is now fully implemented with all core features:
 
-## 🛠️ Tech Stack
+### ✅ **Completed Features**
+
+#### **Phase 1: Setup & Admin Core**
+- ✅ **Task 1**: Initial Project & Auth Setup
+  - Next.js 14 with TypeScript and App Router
+  - Supabase integration with database schema
+  - GitHub OAuth authentication for admins
+  - Beautiful landing page with MagicUI components
+
+- ✅ **Task 2**: Admin Dashboard & Adding Repos
+  - Admin dashboard with repository management
+  - GitHub repository fetching via Octokit.js
+  - "Add Repo" modal with searchable dropdown
+  - Project cards with shareable portal URLs
+
+#### **Phase 2: Guest Portal & Launch Prep**
+- ✅ **Task 3**: Guest Portal & Magic Link Auth
+  - Dynamic guest portal routes (`/portal/[shareable_link_id]`)
+  - Magic link authentication for guests
+  - Secure email-based access without GitHub accounts
+
+- ✅ **Task 4**: Guest Issue Viewing & Creation
+  - View existing GitHub issues in the portal
+  - Create new issues directly from the portal
+  - Issue cards with expandable content and labels
+  - Real-time issue creation via GitHub API
+
+- ✅ **Task 5**: Final Polish & Deployment
+  - Custom 404 and error pages
+  - Loading states and error handling
+  - Enhanced accessibility and UX
+  - Deployment-ready configuration
+
+## 🛠 **Tech Stack**
 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Backend**: Supabase (Auth, Database, Edge Functions)
+- **Backend/Database**: Supabase (Auth, Database, Edge Functions)
 - **GitHub API**: Octokit.js
-- **UI Components**: Radix UI + Lucide React
+- **Authentication**: GitHub OAuth, Supabase Auth Helpers, Magic Link
+- **UI Components**: Radix UI, Lucide React, MagicUI
+- **Deployment**: Vercel
 
-## 📋 Prerequisites
+## 📋 **Prerequisites**
 
-- Node.js 18+ 
-- npm or yarn
-- Supabase account
-- GitHub account
+1. **Node.js** (v18 or higher)
+2. **Supabase Account** - [Sign up here](https://supabase.com)
+3. **GitHub Account** - For OAuth setup
+4. **Vercel Account** - For deployment (optional)
 
-## 🚀 Quick Start
+## 🚀 **Quick Start**
 
-### 1. Clone and Install
+### 1. Supabase Setup
+
+1. Create a new Supabase project
+2. Run the SQL schema from `supabase/schema.sql` in your Supabase SQL editor
+3. Enable GitHub OAuth in Authentication > Providers
+4. Copy your Supabase URL and anon key
+
+### 2. GitHub OAuth App Setup
+
+1. Go to GitHub Settings > Developer settings > OAuth Apps
+2. Create a new OAuth App with:
+   - **Homepage URL**: `http://localhost:3000` (dev) or your production URL
+   - **Authorization callback URL**: `http://localhost:3000/auth/callback` (dev) or your production callback URL
+3. Copy the Client ID and Client Secret to Supabase GitHub provider settings
+
+### 3. Environment Variables
+
+Create a `.env.local` file based on `env.example`:
 
 ```bash
-git clone <repository-url>
-cd know-repo
-npm install
-```
-
-### 2. Set up Supabase
-
-1. Create a new Supabase project at [supabase.com](https://supabase.com)
-2. Go to your project dashboard
-3. Navigate to **SQL Editor** and run the schema from `supabase/schema.sql`
-4. Go to **Authentication > Providers > GitHub** and enable GitHub OAuth
-5. Add your GitHub OAuth App credentials (see GitHub setup below)
-
-### 3. Set up GitHub OAuth App
-
-1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
-2. Click **New OAuth App**
-3. Fill in the details:
-   - **Application name**: Know-Repo
-   - **Homepage URL**: `http://localhost:3000` (development)
-   - **Authorization callback URL**: `https://[your-project-ref].supabase.co/auth/v1/callback`
-4. Copy the **Client ID** and **Client Secret**
-5. Add these to your Supabase project under **Authentication > Providers > GitHub**
-
-### 4. Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -69,15 +88,19 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_nextauth_secret
 ```
 
-### 5. Run the Development Server
+### 4. Run Locally
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the application.
+Visit `http://localhost:3000` to see the application.
 
-## 📁 Project Structure
+## 🏗 **Project Structure**
 
 ```
 src/
@@ -85,99 +108,162 @@ src/
 │   ├── api/               # API routes
 │   ├── auth/              # Authentication pages
 │   ├── dashboard/         # Admin dashboard
-│   └── portal/            # Guest portal
+│   ├── portal/            # Guest portal
+│   └── globals.css        # Global styles
 ├── components/            # React components
-│   ├── dashboard/         # Dashboard components
-│   └── ui/               # UI components
-└── lib/                  # Utilities and configurations
-    └── supabase.ts       # Supabase client
+│   ├── dashboard/         # Admin dashboard components
+│   ├── portal/           # Guest portal components
+│   └── ui/               # Reusable UI components
+├── lib/                  # Utility libraries
+│   └── supabase.ts       # Supabase client
+└── types/                # TypeScript types
 ```
 
-## 🔐 Authentication Flow
+## 🔐 **Authentication Flows**
 
-### Admin Flow
+### **Admin Flow**
 1. Admin signs in with GitHub OAuth
-2. GitHub token is stored securely in Supabase
-3. Admin can add repositories to create guest portals
-4. Admin receives shareable links for each portal
+2. GitHub `provider_token` is stored securely in Supabase
+3. Admin can add repositories and generate shareable links
+4. Admin manages portal access and views
 
-### Guest Flow
-1. Guest receives a portal link
-2. Guest enters email for magic link authentication
-3. Guest can view and create issues in the repository
-4. No GitHub account required
+### **Guest Flow**
+1. Guest receives a portal link (e.g., `/portal/abc123`)
+2. Guest enters email address for magic link authentication
+3. Guest receives email with secure access link
+4. Guest can view and create issues without GitHub account
 
-## 🗄️ Database Schema
+## 🗄 **Database Schema**
 
-### Tables
-- **profiles**: User profiles with GitHub tokens
-- **projects**: Repository portals created by admins
-- **guests**: Guest access tracking
+### **profiles** table
+- `id` (UUID, Primary Key)
+- `github_username` (Text)
+- `avatar_url` (Text)
+- `github_provider_token` (Text, encrypted)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-### Security
-- Row Level Security (RLS) policies protect data
-- GitHub tokens are encrypted
-- Guest access is controlled by shareable links
+### **projects** table
+- `id` (UUID, Primary Key)
+- `user_id` (UUID, Foreign Key to profiles)
+- `project_name` (Text)
+- `github_repo_fullname` (Text)
+- `shareable_link_id` (Text, unique)
+- `created_at` (Timestamp)
+- `updated_at` (Timestamp)
 
-## 🚀 Deployment
+### **guests** table
+- `id` (UUID, Primary Key)
+- `project_id` (UUID, Foreign Key to projects)
+- `guest_email` (Text)
+- `created_at` (Timestamp)
 
-### Vercel (Recommended)
+## 🚀 **Deployment**
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy!
+### **Vercel Deployment**
 
-### Environment Variables for Production
+1. **Connect Repository**
+   ```bash
+   # Install Vercel CLI
+   npm i -g vercel
+   
+   # Deploy
+   vercel
+   ```
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
-NEXTAUTH_URL=https://your-domain.vercel.app
-NEXTAUTH_SECRET=your_production_secret
+2. **Environment Variables**
+   - Add all environment variables in Vercel dashboard
+   - Update GitHub OAuth callback URLs to production domain
+
+3. **Domain Setup**
+   - Configure custom domain in Vercel dashboard
+   - Update GitHub OAuth app with production URLs
+
+### **Manual Deployment**
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to your preferred platform**
+   - Vercel (recommended)
+   - Netlify
+   - Railway
+   - AWS Amplify
+
+## 🎯 **Usage**
+
+### **For Repository Owners (Admins)**
+1. Sign in with GitHub at `/auth/signin`
+2. Add repositories from your GitHub account
+3. Share the generated portal links with guests
+4. Monitor issue activity through the dashboard
+
+### **For Guests**
+1. Click on a shared portal link
+2. Enter your email address
+3. Check your email for the magic link
+4. View and create issues without a GitHub account
+
+## 🧪 **Development**
+
+### **Code Conventions**
+- **TypeScript**: Strict mode enabled
+- **Components**: Functional components with hooks
+- **Styling**: Tailwind CSS with custom utilities
+- **State Management**: React hooks (useState, useReducer)
+- **API**: Next.js API routes with proper error handling
+
+### **Testing**
+```bash
+# Run linting
+npm run lint
+
+# Type checking
+npx tsc --noEmit
 ```
 
-## 🔧 Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-### Code Conventions
-
-- **File Naming**: Use `kebab-case` for files and `PascalCase` for React components
-- **Error Handling**: Wrap all API calls in try-catch blocks
-- **Security**: Never expose tokens on the client side
-- **Components**: Decompose UI into small, reusable components
-
-## 🤝 Contributing
+## 🤝 **Contributing**
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📄 License
+## 📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🗺 **Roadmap**
 
-If you encounter any issues:
+### **V1.1 Enhancements (Post-MVP)**
+- [ ] **Task 6**: Enhance Guest Portal with README
+  - Display repository README in guest portal
+  - Markdown rendering with syntax highlighting
+  - File tree navigation
 
-1. Check the [Supabase documentation](https://supabase.com/docs)
-2. Review the [Next.js documentation](https://nextjs.org/docs)
-3. Open an issue in this repository
+- [ ] **Task 7**: Advanced Issue Filtering
+  - Filter issues by labels, assignees, dates
+  - Search functionality
+  - Issue templates
 
-## 🗺️ Roadmap
-
-- [ ] README rendering in guest portals
-- [ ] Advanced issue filtering
-- [ ] Issue templates
-- [ ] Email notifications
+### **Future Features**
+- [ ] Issue comments and discussions
+- [ ] Pull request viewing
+- [ ] Repository analytics
 - [ ] Team collaboration features
-- [ ] Mobile app
+- [ ] Advanced security options
+- [ ] API rate limiting and caching
+
+## 🆘 **Support**
+
+For support, please:
+1. Check the [documentation](docs/)
+2. Review existing issues
+3. Create a new issue with detailed information
+
+---
+
+**Built with ❤️ using Next.js, Supabase, and Tailwind CSS**
