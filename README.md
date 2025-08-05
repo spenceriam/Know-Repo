@@ -1,135 +1,183 @@
-# Know-Repo
+# Know-Repo MVP
 
-![Project Status](https://img.shields.io/badge/status-in%20progress-yellow)
-![Version](https://img.shields.io/badge/version-0.1.0--MVP-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+A simple, secure web portal that allows non-technical stakeholders to view and create issues in GitHub repositories without requiring GitHub accounts.
 
-![Tech Stack](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
-![Tech Stack](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Tech Stack](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Tech Stack](https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![Tech Stack](https://img.shields.io/badge/Netlify-000000?style=for-the-badge&logo=netlify&logoColor=white)
+## 🚀 Features
 
-The simplest way for freelancers and agencies to share GitHub project progress with non-technical clients and stakeholders.
-
----
-
-## The Problem
-
-Developers live in GitHub. Clients and non-technical stakeholders do not. This leads to friction: developers manually copying/pasting issue updates into emails and project management tools, and clients struggling to report bugs or track progress without being forced to sign up for a tool they don't understand.
-
-## The Solution
-
-**Know-Repo** provides a secure, dead-simple, read-only portal for your clients. An admin (you) can select a GitHub repository and generate a unique, shareable link. Your client can use this link to view a clean list of open issues and submit new ones directly to your repository, all without needing a GitHub account.
-
-## ✨ Core Features (MVP)
-
-* **Secure Admin Auth:** Admins authenticate securely using their existing GitHub account.
-* **Repo Selection:** Quickly select any of your private or public repositories to create a shareable portal.
-* **Frictionless Guest Access:** Guests access the portal via a secure magic link sent to their email. No GitHub account or password is required.
-* **Simple Issue Viewing:** Guests see a clean, simplified list of all **open** issues in the repository.
-* **Direct Issue Creation:** Guests can create new issues through a simple form, which land directly in your GitHub repo, perfectly formatted.
-
----
-
-## 🌊 User Flows
-
-### Admin User Flow
-
-```mermaid
-graph TD
-    A[Start: Unauthenticated Admin] --> B{Lands on Homepage};
-    B --> C[Clicks &quot;Sign in with GitHub&quot;];
-    C --> D[Redirects to GitHub OAuth];
-    D --> E{Authorizes App};
-    E --> F[Redirects back to /dashboard];
-    F --> G{Are any repos added?};
-    G -- No --> H[Prompts &quot;Add Repo&quot;];
-    G -- Yes --> I[Displays list of Added Repos];
-    H --> J[Clicks &quot;Add Repo&quot;];
-    J --> K[Selects a Repo from their list];
-    K --> L[Repo is added to dashboard];
-    L --> I;
-    I --> M[Clicks &quot;Share&quot; on a Repo Card];
-    M --> N[Copies unique portal URL to clipboard];
-    N --> O[End: Sends URL to Guest];
-```
-
-### Guest User Flow
-```mermaid
-graph TD
-    A[Start: Guest receives Portal URL] --> B[Clicks Link];
-    B --> C{Portal Page: Is Guest Authenticated?};
-    C -- No --> D[Prompts for Email];
-    D --> E[Submits Email];
-    E --> F[Receives Magic Link Email];
-    F --> G[Clicks Link in Email];
-    G --> C;
-    C -- Yes --> H[Displays simple list of **OPEN** issues];
-    H --> I{Wants to add an issue?};
-    I -- Yes --> J[Clicks &quot;Add New Issue&quot;];
-    J --> K[Fills out Title/Description Form];
-    K --> L[Submits Form];
-    L --> M[New issue appears in list];
-    M --> H;
-    I -- No --> N[End: Finishes viewing];
-```
+- **Admin Dashboard**: GitHub OAuth authentication for repository owners
+- **Repository Management**: Add and manage which repositories are accessible to guests
+- **Guest Portal**: Magic link authentication for non-technical users
+- **Issue Management**: View and create issues through a simple interface
+- **Secure**: Row Level Security (RLS) policies protect data access
 
 ## 🛠️ Tech Stack
-Framework: Next.js 14 (App Router)
 
-Language: TypeScript
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Backend**: Supabase (Auth, Database, Edge Functions)
+- **GitHub API**: Octokit.js
+- **UI Components**: Radix UI + Lucide React
 
-Styling: Tailwind CSS
+## 📋 Prerequisites
 
-Backend & Database: Supabase (Auth, Database, Edge Functions)
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+- GitHub account
 
-Deployment: Vercel
+## 🚀 Quick Start
 
-GitHub Integration: Octokit.js
+### 1. Clone and Install
 
-## 🚀 Project Status
-This project is currently in the MVP development phase. The core features are being built as defined in the tasks.md document.
-
-## 🏁 Getting Started (Running Locally)
-To run this project locally, follow these steps:
-Clone the repository:
-```
-git clone [https://github.com/](https://github.com/)[your-github-username]/know-repo.git
+```bash
+git clone <repository-url>
 cd know-repo
-```
-Install dependencies:
-```
 npm install
 ```
 
-Set up environment variables:
-Create a file named .env.local in the root of the project.
-Add your Supabase URL and Anon Key, as well as your GitHub OAuth Client ID and Secret.
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+### 2. Set up Supabase
+
+1. Create a new Supabase project at [supabase.com](https://supabase.com)
+2. Go to your project dashboard
+3. Navigate to **SQL Editor** and run the schema from `supabase/schema.sql`
+4. Go to **Authentication > Providers > GitHub** and enable GitHub OAuth
+5. Add your GitHub OAuth App credentials (see GitHub setup below)
+
+### 3. Set up GitHub OAuth App
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click **New OAuth App**
+3. Fill in the details:
+   - **Application name**: Know-Repo
+   - **Homepage URL**: `http://localhost:3000` (development)
+   - **Authorization callback URL**: `https://[your-project-ref].supabase.co/auth/v1/callback`
+4. Copy the **Client ID** and **Client Secret**
+5. Add these to your Supabase project under **Authentication > Providers > GitHub**
+
+### 4. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-GITHUB_CLIENT_ID=your_github_oauth_client_id
-GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+
+# Next.js
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
 ```
 
-You will also need a secret for encrypting the provider_token
-```
-ENCRYPTION_SECRET=a_very_strong_random_32_character_secret
-```
+### 5. Run the Development Server
 
-Run the development server:
-```
+```bash
 npm run dev
 ```
 
-Open http://localhost:3000 to view it in the browser.
+Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 🗺️ Roadmap (Post-MVP)
-Our immediate focus after launching the MVP includes:
+## 📁 Project Structure
 
-[ ] Display Repository README.md: Show the README.md file in the guest portal for better context.
-[ ] Advanced Issue Filtering: Allow guests to view closed, in-progress, and assigned issues.
-[ ] Guest Commenting: Allow guests to add comments to existing issues.
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── dashboard/         # Admin dashboard
+│   └── portal/            # Guest portal
+├── components/            # React components
+│   ├── dashboard/         # Dashboard components
+│   └── ui/               # UI components
+└── lib/                  # Utilities and configurations
+    └── supabase.ts       # Supabase client
+```
 
-[ ] Admin Notifications: Notify admins via email when a guest creates a new issue.
+## 🔐 Authentication Flow
+
+### Admin Flow
+1. Admin signs in with GitHub OAuth
+2. GitHub token is stored securely in Supabase
+3. Admin can add repositories to create guest portals
+4. Admin receives shareable links for each portal
+
+### Guest Flow
+1. Guest receives a portal link
+2. Guest enters email for magic link authentication
+3. Guest can view and create issues in the repository
+4. No GitHub account required
+
+## 🗄️ Database Schema
+
+### Tables
+- **profiles**: User profiles with GitHub tokens
+- **projects**: Repository portals created by admins
+- **guests**: Guest access tracking
+
+### Security
+- Row Level Security (RLS) policies protect data
+- GitHub tokens are encrypted
+- Guest access is controlled by shareable links
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+### Environment Variables for Production
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
+NEXTAUTH_URL=https://your-domain.vercel.app
+NEXTAUTH_SECRET=your_production_secret
+```
+
+## 🔧 Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+### Code Conventions
+
+- **File Naming**: Use `kebab-case` for files and `PascalCase` for React components
+- **Error Handling**: Wrap all API calls in try-catch blocks
+- **Security**: Never expose tokens on the client side
+- **Components**: Decompose UI into small, reusable components
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+If you encounter any issues:
+
+1. Check the [Supabase documentation](https://supabase.com/docs)
+2. Review the [Next.js documentation](https://nextjs.org/docs)
+3. Open an issue in this repository
+
+## 🗺️ Roadmap
+
+- [ ] README rendering in guest portals
+- [ ] Advanced issue filtering
+- [ ] Issue templates
+- [ ] Email notifications
+- [ ] Team collaboration features
+- [ ] Mobile app
